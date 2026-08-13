@@ -27,27 +27,27 @@
   .header h1 { font-size: 20px; font-weight: 600; margin: 0; }
   .header p { font-size: 13px; color: #6b6b68; margin: 4px 0 0; }
   .row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     padding: 14px 0;
     border-bottom: 1px solid #EEECE5;
   }
   .row:last-of-type { border-bottom: none; }
-  .flavor { display: flex; align-items: center; gap: 10px; font-size: 16px; }
+  .flavor { display: flex; align-items: center; gap: 10px; font-size: 16px; margin-bottom: 10px; }
   .flavor-emoji { font-size: 22px; }
-  .qty-controls { display: flex; align-items: center; gap: 12px; }
+  .sub-options { display: flex; flex-direction: column; gap: 8px; padding-left: 32px; }
+  .sub-option { display: flex; align-items: center; justify-content: space-between; }
+  .sub-option-label { font-size: 13px; color: #6b6b68; }
+  .qty-controls { display: flex; align-items: center; gap: 10px; }
   .qty-btn {
-    width: 34px; height: 34px;
+    width: 28px; height: 28px;
     border-radius: 50%;
     border: 1px solid #D3D1C7;
     background: #FAFAF8;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
   }
   .qty-btn:active { background: #EEECE5; }
-  .qty-val { min-width: 20px; text-align: center; font-size: 16px; font-weight: 500; }
+  .qty-val { min-width: 18px; text-align: center; font-size: 15px; font-weight: 500; }
   .total-row {
     display: flex;
     justify-content: space-between;
@@ -138,30 +138,47 @@
   const price = 2.50;
   const phone = '593998101170';
 
+  const prep = [
+    { id: 'frita', label: 'Frita' },
+    { id: 'normal', label: 'Sin freír' }
+  ];
+
   const itemsEl = document.getElementById('items');
   const state = {};
 
   flavors.forEach(f => {
-    state[f.id] = 0;
+    state[f.id] = {};
+    prep.forEach(p => { state[f.id][p.id] = 0; });
+
     const row = document.createElement('div');
     row.className = 'row';
+
+    const subOptionsHtml = prep.map(p => `
+      <div class="sub-option">
+        <span class="sub-option-label">${p.label}</span>
+        <div class="qty-controls">
+          <button class="qty-btn" data-action="dec" data-id="${f.id}" data-prep="${p.id}">-</button>
+          <span class="qty-val" id="qty-${f.id}-${p.id}">0</span>
+          <button class="qty-btn" data-action="inc" data-id="${f.id}" data-prep="${p.id}">+</button>
+        </div>
+      </div>
+    `).join('');
+
     row.innerHTML = `
       <div class="flavor">
         <span class="flavor-emoji">${f.emoji}</span>
         <span>${f.name}</span>
       </div>
-      <div class="qty-controls">
-        <button class="qty-btn" data-action="dec" data-id="${f.id}">-</button>
-        <span class="qty-val" id="qty-${f.id}">0</span>
-        <button class="qty-btn" data-action="inc" data-id="${f.id}">+</button>
-      </div>
+      <div class="sub-options">${subOptionsHtml}</div>
     `;
     itemsEl.appendChild(row);
   });
 
   function updateTotal() {
     let total = 0;
-    flavors.forEach(f => { total += state[f.id] * price; });
+    flavors.forEach(f => {
+      prep.forEach(p => { total += state[f.id][p.id] * price; });
+    });
     document.getElementById('total').textContent = '$' + total.toFixed(2);
   }
 
@@ -169,10 +186,11 @@
     const btn = e.target.closest('button');
     if (!btn) return;
     const id = btn.dataset.id;
+    const prepId = btn.dataset.prep;
     const action = btn.dataset.action;
-    if (action === 'inc') state[id]++;
-    if (action === 'dec') state[id] = Math.max(0, state[id] - 1);
-    document.getElementById('qty-' + id).textContent = state[id];
+    if (action === 'inc') state[id][prepId]++;
+    if (action === 'dec') state[id][prepId] = Math.max(0, state[id][prepId] - 1);
+    document.getElementById(`qty-${id}-${prepId}`).textContent = state[id][prepId];
     updateTotal();
     document.getElementById('error').style.display = 'none';
   });
@@ -180,8 +198,20 @@
   document.getElementById('send-btn').addEventListener('click', () => {
     const nameInput = document.getElementById('buyer-name');
     const name = nameInput.value.trim();
-    const chosen = flavors.filter(f => state[f.id] > 0);
     const errorEl = document.getElementById('error');
+
+    let total = 0;
+    let lines = [];
+    flavors.forEach(f => {
+      prep.forEach(p => {
+        const qty = state[f.id][p.id];
+        if (qty > 0) {
+          const subtotal = qty * price;
+          total += subtotal;
+          lines.push(`${qty} bandeja(s) de ${f.name} (${p.label}) - $${subtotal.toFixed(2)}`);
+        }
+      });
+    });
 
     if (!name) {
       errorEl.textContent = 'Escribe tu nombre antes de enviar.';
@@ -189,17 +219,11 @@
       nameInput.focus();
       return;
     }
-    if (chosen.length === 0) {
+    if (lines.length === 0) {
       errorEl.textContent = 'Elige al menos una bandeja antes de enviar.';
       errorEl.style.display = 'block';
       return;
     }
-    let total = 0;
-    let lines = chosen.map(f => {
-      const subtotal = state[f.id] * price;
-      total += subtotal;
-      return `${state[f.id]} bandeja(s) de ${f.name} - $${subtotal.toFixed(2)}`;
-    });
     const message = `Hola! Soy ${name} y quiero pedir:\n${lines.join('\n')}\n\nTotal: $${total.toFixed(2)}`;
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.location.href = url;
