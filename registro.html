@@ -205,15 +205,15 @@ document.addEventListener('click',async e=>{
 function buildCompras(){
   $('#cf').innerHTML=PROD.map(([k,n,u])=>`<div class="g2"><div><label>${n} (${u})</label><input id="q-${k}" type="number" step="any" inputmode="decimal" placeholder="cantidad"></div><div><label>Precio total ($)</label><input id="p-${k}" type="number" step="0.01" inputmode="decimal" placeholder="0,00"></div></div>`).join('');
 }
-const sumC=c=>Object.values(c.items||{}).reduce((a,i)=>a+(+i.p||0),0);
 function rCompras(){
   const l=S.compras.filter(c=>c.fecha===fecha).sort((a,b)=>a.t-b.t);
-  $('#cl').innerHTML=l.length?l.map(c=>`<div class="li"><span>${Object.entries(c.items).map(([k,i])=>PROD.find(p=>p[0]===k)[1]+' '+i.q+' → '+money(+i.p)).join(' · ')}<br><b>${money(sumC(c))}</b></span><button data-dc="${c.id}">✕</button></div>`).join(''):'<p class="tip">Sin compras este día.</p>';
+  $('#cl').innerHTML=l.length?l.map(c=>`<div class="li"><span>${(PROD.find(p=>p[0]===c.producto)||[,c.producto])[1]} — ${c.cantidad} → <b>${money(+c.precio)}</b></span><button data-dc="${c.id}">✕</button></div>`).join(''):'<p class="tip">Sin compras este día.</p>';
 }
 $('#cs').onclick=async()=>{
-  const items={};PROD.forEach(([k])=>{const q=parseFloat($('#q-'+k).value),p=parseFloat($('#p-'+k).value);if(q>0||p>0)items[k]={q:q||0,p:p||0}});
-  if(!Object.keys(items).length)return toast('Escribe al menos un producto');
-  await store.add('compras',{fecha,items,t:Date.now()});PROD.forEach(([k])=>{$('#q-'+k).value='';$('#p-'+k).value=''});toast('Compra guardada');
+  const items=PROD.map(([k])=>[k,parseFloat($('#q-'+k).value)||0,parseFloat($('#p-'+k).value)||0]).filter(([,q,p])=>q>0||p>0);
+  if(!items.length)return toast('Escribe al menos un producto');
+  let i=0;for(const[k,q,p]of items){await store.add('compras',{fecha,producto:k,cantidad:q,precio:p,t:Date.now()+i});i++}
+  PROD.forEach(([k])=>{$('#q-'+k).value='';$('#p-'+k).value=''});toast('Compra guardada');
 };
 
 /* ---------- pagos ---------- */
@@ -237,7 +237,7 @@ function rResumen(){
   const blk=(tit,f)=>{
     const dias=[...new Set(S.ventas.filter(v=>f(v.fecha)).map(v=>v.fecha))];
     let vt=0,vb=0;dias.forEach(d=>{const x=ventaDia(d);vt+=x.$;vb+=x.b});
-    const ct=S.compras.filter(c=>f(c.fecha)).reduce((a,c)=>a+sumC(c),0);
+    const ct=S.compras.filter(c=>f(c.fecha)).reduce((a,c)=>a+(+c.precio||0),0);
     const pg=k=>S.pagos.filter(p=>f(p.fecha)&&p.tipo===k).reduce((a,p)=>a+(+p.monto||0),0);
     return`<div class="card"><h2>${tit}</h2><div class="kpis">
     <div class="k"><span>Ventas</span><b>${money(vt)}</b></div><div class="k"><span>Bandejas vendidas</span><b>${vb}</b></div>
@@ -256,7 +256,7 @@ function rowsExport(mes,coma){
   const V=dV.map(d=>[...dparts(d),'','',...'GHIJKLM'.split('').map(k=>num(cnt(k,d),coma))]);
   const dC=[...new Set(S.compras.filter(c=>inM(c.fecha)).map(c=>c.fecha))].sort();
   const C=dC.map(d=>{const cs=S.compras.filter(c=>c.fecha===d);const r=[...dparts(d)];
-    PROD.forEach(([k])=>{let q=0,p=0;cs.forEach(c=>{if(c.items[k]){q+=+c.items[k].q||0;p+=+c.items[k].p||0}});r.push(num(q,coma),num(p,coma))});return r});
+    PROD.forEach(([k])=>{let q=0,p=0;cs.forEach(c=>{if(c.producto===k){q+=+c.cantidad||0;p+=+c.precio||0}});r.push(num(q,coma),num(p,coma))});return r});
   const pg=k=>S.pagos.filter(p=>p.tipo===k&&inM(p.fecha)).sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.t-b.t).map(p=>{const[y,m,d]=p.fecha.split('-');return[d+'/'+m+'/'+y,num(+p.monto,coma),p.detalle]});
   return{'VENTAS':V,'COMPRAS':C,'PAGOS MO':pg('mo'),'PAGOS LOGISTICA':pg('log'),'PAGOS VENDEDOR':pg('ven')};
 }
