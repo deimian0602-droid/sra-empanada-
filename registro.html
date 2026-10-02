@@ -50,7 +50,7 @@ textarea{height:110px;font-family:ui-monospace,Menlo,monospace;font-size:11px;wh
 <h1><span>🥟 Sra. Empanada · Registro</span><span id="st">conectando…</span></h1>
 <div class="bar"><input type="date" id="fecha"></div>
 </header>
-<nav id="nav"><button data-t="v" class="on">Ventas</button><button data-t="c">Compras</button><button data-t="p">Pagos</button><button data-t="r">Resumen</button><button data-t="e">Exportar</button><button data-t="g">⚙ Config</button></nav>
+<nav id="nav"><button data-t="v" class="on">Ventas</button><button data-t="c">Compras</button><button data-t="p">Pagos</button><button data-t="r">Resumen</button><button data-t="e">Exportar</button></nav>
 <main>
 <section id="t-v" class="on">
 <div class="card"><h2>Toca cada vez que vendas una bandeja</h2>
@@ -80,15 +80,6 @@ textarea{height:110px;font-family:ui-monospace,Menlo,monospace;font-size:11px;wh
 <p class="tip">Pega cada bloque en la fila de su fecha, columna A de la hoja indicada. Las columnas son las mismas de tu Excel; los vacíos quedan vacíos.</p></div>
 <div id="ex"></div>
 </section>
-<section id="t-g">
-<div class="card"><h2>Conectar con Google Sheets (en vivo, automático)</h2>
-<label>Link de tu Apps Script (termina en /exec)</label>
-<input id="apiurl" type="url" placeholder="https://script.google.com/macros/s/AAA.../exec">
-<div class="g2"><button class="btn" id="apisave">Guardar y conectar</button><button class="btn sec" id="apitest">Probar conexión</button></div>
-<p class="tip" id="apimsg"></p>
-<p class="tip">Pega aquí el mismo link en <b>cada celular</b> que vaya a usar esta página (el tuyo y el del vendedor). Una vez guardado, todo se sincroniza solo — no hace falta tocar esto de nuevo.</p></div>
-<div class="card"><h2>¿Sin conectar todavía?</h2><p class="tip">La página funciona igual sin esto, pero cada celular guarda sus datos por separado (revisa "Exportar"). Pídele a Claude el código de Apps Script si todavía no lo tienes.</p></div>
-</section>
 </main>
 <div id="toast"></div>
 <script>
@@ -106,7 +97,7 @@ const money=n=>'$'+n.toFixed(2).replace('.',',');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),1600)}
 
-/* ---------- almacenamiento: local (por dispositivo) o remoto en vivo (Google Sheets) ---------- */
+/* ---------- almacenamiento: solo en este dispositivo ---------- */
 function localStore(){
   const mem={};const subs={};
   const load=c=>{try{return JSON.parse(localStorage.getItem('sra_'+c)||'[]')}catch(e){return mem[c]||[]}};
@@ -116,70 +107,9 @@ function localStore(){
     async del(c,id){save(c,load(c).filter(x=>x.id!==id))},
     sub(c,f){(subs[c]=subs[c]||[]).push(f);f(load(c))}};
 }
-function remoteStore(url){
-  const cache={ventas:[],compras:[],pagos:[]}, subs={ventas:[],compras:[],pagos:[]};
-  let pending=[];try{pending=JSON.parse(localStorage.getItem('sra_pending')||'[]')}catch(e){}
-  const savePending=()=>{try{localStorage.setItem('sra_pending',JSON.stringify(pending))}catch(e){}};
-  const notify=c=>(subs[c]||[]).forEach(f=>f(cache[c]));
-  async function flushPending(){
-    if(!pending.length)return;const rest=[];
-    for(const p of pending){try{await fetch(url,{method:'POST',body:JSON.stringify(p)})}catch(e){rest.push(p)}}
-    pending=rest;savePending();
-  }
-  let polling=false;
-  async function poll(){
-    if(polling)return;polling=true;
-    try{
-      await flushPending();
-      const r=await fetch(url+'?_='+Date.now());const j=await r.json();
-      ['ventas','compras','pagos'].forEach(c=>{
-        let arr=j[c]||[];
-        if(c==='compras')arr=arr.map(d=>({...d,items:typeof d.items==='string'?JSON.parse(d.items):d.items}));
-        cache[c]=arr;notify(c);
-      });
-      const st=$('#st');if(st)st.innerHTML='<span class="cfgok">● en línea</span> (Google Sheets)';
-    }catch(e){const st=$('#st');if(st)st.textContent='sin conexión — reintentando…';}
-    polling=false;
-  }
-  poll();setInterval(poll,15000);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
-  window.addEventListener('online',poll);
-  return{mode:'remote',
-    async add(c,d){
-      const doc={coleccion:c,...d};const tmp={id:'tmp'+Date.now()+Math.random().toString(36).slice(2,5),...d};
-      cache[c]=[...cache[c],tmp];notify(c);
-      try{await fetch(url,{method:'POST',body:JSON.stringify(doc)})}catch(e){pending.push(doc);savePending()}
-      setTimeout(poll,2500);
-    },
-    async del(c,id){
-      cache[c]=cache[c].filter(x=>x.id!==id);notify(c);
-      if(!String(id).startsWith('tmp')){try{await fetch(url+'?action=del&coleccion='+c+'&id='+encodeURIComponent(id))}catch(e){}}
-      setTimeout(poll,2500);
-    },
-    sub(c,f){(subs[c]=subs[c]||[]).push(f);f(cache[c])}};
-}
 async function connect(){
-  const url=(localStorage.getItem('sra_apiurl')||'').trim();
-  if(url)return remoteStore(url);
-  const st=$('#st');if(st)st.textContent='guardado solo en este dispositivo — configúralo en ⚙ Config';
+  const st=$('#st');if(st)st.textContent='guardado en este dispositivo';
   return localStore();
-}
-function initConfig(){
-  const saved=localStorage.getItem('sra_apiurl')||'';
-  $('#apiurl').value=saved;
-  $('#apisave').onclick=()=>{
-    const v=$('#apiurl').value.trim();
-    if(!v.includes('/exec')){$('#apimsg').textContent='Ese link no parece de Apps Script (debe terminar en /exec).';return}
-    localStorage.setItem('sra_apiurl',v);$('#apimsg').textContent='Guardado. Recargando...';
-    setTimeout(()=>location.reload(),600);
-  };
-  $('#apitest').onclick=async()=>{
-    const v=$('#apiurl').value.trim();if(!v){$('#apimsg').textContent='Escribe el link primero.';return}
-    $('#apimsg').textContent='Probando...';
-    try{const r=await fetch(v+'?_='+Date.now());const j=await r.json();
-      $('#apimsg').innerHTML='<span class="cfgok">¡Conectado! ✓</span> Ventas: '+(j.ventas||[]).length+', Compras: '+(j.compras||[]).length+', Pagos: '+(j.pagos||[]).length;
-    }catch(e){$('#apimsg').textContent='No se pudo conectar. Revisa que el Deploy sea "Cualquiera" y que el link termine en /exec.'}
-  };
 }
 
 /* ---------- ventas ---------- */
@@ -283,8 +213,9 @@ document.addEventListener('click',async e=>{
 function all(){rVentas();rCompras();rPagos();rResumen();rExport()}
 $('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;$$('nav button').forEach(x=>x.classList.toggle('on',x===b));$$('section').forEach(s=>s.classList.toggle('on',s.id==='t-'+b.dataset.t))};
 fecha=hoy();$('#fecha').value=fecha;$('#fecha').onchange=e=>{fecha=e.target.value||hoy();all()};
-buildGrid();buildCompras();initConfig();all();
+buildGrid();buildCompras();all();
 connect().then(s=>{store=s;
   ['ventas','compras','pagos'].forEach(c=>s.sub(c,a=>{S[c]=a;all()}));
 });
 </script></body></html>
+
