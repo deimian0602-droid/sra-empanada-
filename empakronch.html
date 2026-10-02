@@ -53,11 +53,15 @@ textarea{height:110px;font-family:ui-monospace,Menlo,monospace;font-size:11px;wh
 <nav id="nav"><button data-t="v" class="on">Ventas</button><button data-t="c">Compras</button><button data-t="p">Pagos</button><button data-t="r">Resumen</button><button data-t="e">Exportar</button></nav>
 <main>
 <section id="t-v" class="on">
-<div class="card"><h2>Toca cada vez que vendas una bandeja</h2>
+<div class="card"><h2>Toca lo que le vendas a esta persona, luego Guardar venta</h2>
 <div id="grid"></div>
 <div class="tap promo" role="button" tabindex="0" data-p="M" id="promo"><b>PROMO 3 x $5,00</b><span class="n" id="n-M">0</span><small>cada toque = 1 promo (3 bandejas)</small><button class="und" data-u="M" style="top:6px;right:6px;background:#fff;color:#c55a11">−</button></div>
-<p class="tip">El "−" borra el último toque de ese producto en el día elegido.</p></div>
-<div class="kpis"><div class="k"><span>Vendido hoy</span><b id="vt">$0,00</b></div><div class="k"><span>Bandejas hoy</span><b id="vb">0</b></div></div>
+<p class="tip">El "−" quita el último toque de ese producto de esta venta (todavía sin guardar).</p>
+<div class="kpis"><div class="k"><span>Esta venta</span><b id="pendTotal">$0,00</b></div><div class="k"><span>Bandejas</span><b id="pendBandejas">0</b></div></div>
+<button class="btn" id="guardarVenta" disabled>Guardar venta</button>
+</div>
+<div class="card"><h2>Ventas guardadas hoy</h2><div id="vl"></div></div>
+<div class="kpis"><div class="k"><span>Vendido hoy (guardado)</span><b id="vt">$0,00</b></div><div class="k"><span>Bandejas hoy (guardado)</span><b id="vb">0</b></div></div>
 </section>
 <section id="t-c">
 <div class="card"><h2>Registrar compra (cantidad y precio total pagado)</h2><div id="cf"></div>
@@ -112,23 +116,53 @@ async function connect(){
   return localStore();
 }
 
-/* ---------- ventas ---------- */
+/* ---------- ventas (acumula en pantalla, se guarda como UNA venta con "Guardar venta") ---------- */
+let pend={}; // {codigo: cantidad} de la venta que se está armando, aún sin guardar
+const NOMBRE={G:'Pollo cruda',H:'Carne cruda',I:'Queso cruda',J:'Pollo frita',K:'Carne frita',L:'Queso frita',M:'Promo 3x$5'};
+const precioDe=k=>k==='M'?P.promo:(['J','K','L'].includes(k)?P.frita:P.cruda);
+const bandejasDe=k=>k==='M'?3:1;
 function buildGrid(){
   $('#grid').innerHTML=SAB.map(([n,c,f])=>`<div class="row"><b>${n}</b>
   <div class="tap" role="button" tabindex="0" data-p="${c}"><span>Cruda</span><span class="n" id="n-${c}">0</span><small>${money(P.cruda)}</small><button class="und" data-u="${c}">−</button></div>
   <div class="tap" role="button" tabindex="0" data-p="${f}"><span>Frita</span><span class="n" id="n-${f}">0</span><small>${money(P.frita)}</small><button class="und" data-u="${f}">−</button></div></div>`).join('');
 }
-const cnt=(prod,f=fecha)=>S.ventas.filter(v=>v.fecha===f&&v.prod===prod).length;
-const ventaDia=f=>{const g=k=>cnt(k,f);return{$:(g('G')+g('H')+g('I'))*P.cruda+(g('J')+g('K')+g('L'))*P.frita+g('M')*P.promo,b:'GHIJKL'.split('').reduce((a,k)=>a+g(k),0)+g('M')*3}};
-function rVentas(){
-  'GHIJKLM'.split('').forEach(k=>{const e=$('#n-'+k);if(e)e.textContent=cnt(k)});
-  const v=ventaDia(fecha);$('#vt').textContent=money(v.$);$('#vb').textContent=v.b;
+function totalPend(){let $=0,b=0;Object.entries(pend).forEach(([k,n])=>{$+=precioDe(k)*n;b+=bandejasDe(k)*n});return{$,b}}
+function rPend(){
+  'GHIJKLM'.split('').forEach(k=>{const e=$('#n-'+k);if(e)e.textContent=pend[k]||0});
+  const t=totalPend();$('#pendTotal').textContent=money(t.$);$('#pendBandejas').textContent=t.b;
+  $('#guardarVenta').disabled=t.b===0;
 }
-document.addEventListener('click',async e=>{
+function rVentas(){
+  const dia=S.ventas.filter(v=>v.fecha===fecha);
+  const grupos={};dia.forEach(v=>{const g=v.venta||v.id;(grupos[g]=grupos[g]||[]).push(v)});
+  const keys=Object.keys(grupos).sort((a,b)=>grupos[a][0].t-grupos[b][0].t);
+  $('#vl').innerHTML=keys.length?keys.map(g=>{
+    const items=grupos[g];const cnts={};items.forEach(v=>cnts[v.prod]=(cnts[v.prod]||0)+1);
+    const txt=Object.entries(cnts).map(([k,n])=>NOMBRE[k]+' x'+n).join(' · ');
+    const tot=items.reduce((a,v)=>a+precioDe(v.prod),0);
+    return `<div class="li"><span>${txt}<br><b>${money(tot)}</b></span><button data-dv="${g}">✕</button></div>`;
+  }).join(''):'<p class="tip">Sin ventas guardadas este día.</p>';
+  let $t=0,bt=0;dia.forEach(v=>{$t+=precioDe(v.prod);bt+=bandejasDe(v.prod)});
+  $('#vt').textContent=money($t);$('#vb').textContent=bt;
+  rPend();
+}
+document.addEventListener('click',e=>{
   const u=e.target.closest('[data-u]'),t=e.target.closest('[data-p]');
-  if(!store)return;
-  if(u){e.stopPropagation();const k=u.dataset.u;const l=S.ventas.filter(v=>v.fecha===fecha&&v.prod===k).sort((a,b)=>b.t-a.t)[0];if(l){await store.del('ventas',l.id);toast('Borrado 1')}return}
-  if(t){await store.add('ventas',{fecha,prod:t.dataset.p,t:Date.now()});if(navigator.vibrate)navigator.vibrate(15)}
+  if(u){e.stopPropagation();const k=u.dataset.u;if(pend[k]>0){pend[k]--;if(!pend[k])delete pend[k]}rPend();return}
+  if(t){const k=t.dataset.p;pend[k]=(pend[k]||0)+1;rPend();if(navigator.vibrate)navigator.vibrate(15)}
+});
+$('#guardarVenta').onclick=async()=>{
+  const entries=Object.entries(pend);if(!entries.length)return;
+  const grupo='v'+Date.now()+Math.random().toString(36).slice(2,5);let i=0;
+  for(const[k,n]of entries){for(let j=0;j<n;j++){await store.add('ventas',{fecha,prod:k,venta:grupo,t:Date.now()+(i++)})}}
+  pend={};rPend();toast('Venta guardada');
+};
+document.addEventListener('click',async e=>{
+  const dv=e.target.closest('[data-dv]');if(!dv)return;
+  const g=dv.dataset.dv;const items=S.ventas.filter(v=>v.fecha===fecha&&(v.venta||v.id)===g);
+  if(!confirm('¿Borrar esta venta completa?'))return;
+  for(const it of items){await store.del('ventas',it.id)}
+  toast('Venta borrada');
 });
 
 /* ---------- compras ---------- */
