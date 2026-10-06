@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sra. Empanada – Registro</title>
+<style>
+:root{--bg:#fff8ef;--card:#fff;--ink:#3b2417;--mut:#7a6555;--br:#5b3a29;--or:#c55a11;--ok:#2e7d32;--line:#ead9c4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1611;--card:#2a2019;--ink:#f4e7d8;--mut:#b9a693;--br:#e0a070;--or:#e8813a;--ok:#66bb6a;--line:#43342a}}
+:root[data-theme="dark"]{--bg:#1d1611;--card:#2a2019;--ink:#f4e7d8;--mut:#b9a693;--br:#e0a070;--or:#e8813a;--ok:#66bb6a;--line:#43342a}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--br);color:#fff;padding:10px 14px}
+:root[data-theme="dark"] header,:root:not([data-theme="light"]) header{}
+header h1{font-size:17px;margin:0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+#st{font-size:11px;font-weight:400;opacity:.9}
+.bar{display:flex;gap:8px;align-items:center;margin-top:8px}
+.bar input{flex:1;padding:8px;border-radius:8px;border:0;font-size:15px}
+nav{display:flex;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--line)}
+nav button{flex:1;min-width:84px;padding:12px 6px;border:0;background:none;color:var(--mut);font-weight:600;font-size:14px;border-bottom:3px solid transparent}
+nav button.on{color:var(--or);border-color:var(--or)}
+.cfgok{color:var(--ok);font-weight:700}
+.cfgok{color:var(--ok);font-weight:700}
+main{padding:12px;max-width:720px;margin:0 auto}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
+h2{font-size:15px;margin:0 0 8px;color:var(--br)}
+.row{display:grid;grid-template-columns:78px 1fr 1fr;gap:8px;align-items:stretch;margin-bottom:8px}
+.row b{align-self:center;font-size:16px}
+.tap{position:relative;padding:14px 6px;border-radius:12px;border:2px solid var(--or);background:var(--card);color:var(--ink);font-size:15px;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tap:active{background:var(--or);color:#fff}
+.tap small{font-weight:400;color:var(--mut);font-size:11px}
+.tap .n{font-size:26px;color:var(--or)}
+.und{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--mut);font-size:16px;line-height:1;padding:0}
+.promo{width:100%;background:var(--or);color:#fff;border-color:var(--or)}
+.promo .n,.promo small{color:#fff}
+label{display:block;font-size:12px;color:var(--mut);margin:6px 0 2px}
+input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:15px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{width:100%;padding:13px;border-radius:12px;border:0;background:var(--or);color:#fff;font-size:16px;font-weight:700;margin-top:10px}
+.btn.sec{background:var(--card);color:var(--or);border:2px solid var(--or)}
+.li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.li button{border:0;background:none;color:#c62828;font-size:18px}
+.li .rt{display:flex;align-items:center;gap:8px}
+.pagobtn{border:1px solid var(--line);border-radius:16px;padding:5px 10px;font-size:12px;font-weight:700;background:var(--bg);color:var(--mut)}
+.pagobtn.si{background:#e8f5e9;color:var(--ok);border-color:var(--ok)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.k{background:var(--bg);border-radius:10px;padding:10px;text-align:center}
+.k span{display:block;font-size:11px;color:var(--mut)}.k b{font-size:19px;color:var(--br)}
+textarea{height:110px;font-family:ui-monospace,Menlo,monospace;font-size:11px;white-space:pre}
+.tip{font-size:12px;color:var(--mut);margin:4px 0}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#333;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:9}
+#toast.on{opacity:1}
+</style></head><body>
+<header>
+<h1><span>🥟 Sra. Empanada · Registro</span><span id="st">conectando…</span></h1>
+<div class="bar"><input type="date" id="fecha"></div>
+</header>
+<nav id="nav"><button data-t="v" class="on">Ventas</button><button data-t="k">Cortesías</button><button data-t="c">Compras</button><button data-t="p">Pagos</button><button data-t="r">Resumen</button><button data-t="e">Exportar</button><button data-t="g">⚙ Config</button></nav>
+<main>
+<section id="t-v" class="on">
+<div class="card"><h2>Toca lo que le vendas a esta persona, luego Guardar venta</h2>
+<div id="grid"></div>
+<div class="tap promo" role="button" tabindex="0" data-p="M" id="promo"><b>PROMO 3 x $5,00</b><span class="n" id="n-M">0</span><small>cada toque = 1 promo (3 bandejas)</small><button class="und" data-u="M" style="top:6px;right:6px;background:#fff;color:#c55a11">−</button></div>
+<p class="tip">El "−" quita el último toque de ese producto de esta venta (todavía sin guardar).</p>
+<div class="kpis"><div class="k"><span>Esta venta</span><b id="pendTotal">$0,00</b></div><div class="k"><span>Bandejas</span><b id="pendBandejas">0</b></div></div>
+<button class="btn" id="guardarVenta" disabled>Guardar venta</button>
+</div>
+<div class="card"><h2>Ventas guardadas hoy</h2><div id="vl"></div></div>
+<div class="kpis"><div class="k"><span>Vendido hoy (guardado)</span><b id="vt">$0,00</b></div><div class="k"><span>Bandejas hoy (guardado)</span><b id="vb">0</b></div></div>
+</section>
+<section id="t-k">
+<div class="card"><h2>Toca lo que regalas para probar, luego Guardar cortesía</h2>
+<div id="gridK"></div>
+<p class="tip">El "−" quita el último toque de ese producto de esta cortesía (todavía sin guardar). No tiene promo ni precio: es regalo.</p>
+<label>¿A quién se la diste? (opcional)</label>
+<input id="destinatario" type="text" placeholder="Ej: cliente de la esquina, Juan de la tienda...">
+<div class="kpis"><div class="k"><span>Bandejas de esta cortesía</span><b id="pendKBandejas">0</b></div></div>
+<button class="btn" id="guardarCortesia" disabled>Guardar cortesía</button>
+</div>
+<div class="card"><h2>Cortesías guardadas hoy</h2><div id="kl"></div></div>
+<div class="kpis"><div class="k"><span>Bandejas regaladas hoy</span><b id="kb">0</b></div></div>
+</section>
+<section id="t-c">
+<div class="card"><h2>Registrar compra (cantidad y precio total pagado)</h2><div id="cf"></div>
+<button class="btn" id="cs">Guardar compra</button></div>
+<div class="card"><h2>Compras del día</h2><div id="cl"></div></div>
+</section>
+<section id="t-p">
+<div class="card"><h2>Registrar pago</h2>
+<label>Pago de</label><select id="ptipo"><option value="mo">Mano de obra</option><option value="log">Logística</option><option value="ven">Vendedor (comisión)</option></select>
+<label>Monto ($)</label><input id="pmonto" type="number" step="0.01" inputmode="decimal">
+<label>A quién / detalle</label><input id="pdet" type="text">
+<button class="btn" id="ps">Guardar pago</button></div>
+<div class="card"><h2>Pagos del día</h2><div id="pl"></div></div>
+</section>
+<section id="t-r"><div id="res"></div></section>
+<section id="t-e">
+<div class="card"><h2>Pasar al Excel</h2>
+<label>Mes a exportar</label><select id="emes"></select>
+<label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="coma" checked style="width:auto"> Mi Excel usa coma decimal (2,25)</label>
+<p class="tip">Pega cada bloque en la fila de su fecha, columna A de la hoja indicada. Las columnas son las mismas de tu Excel; los vacíos quedan vacíos.</p></div>
+<div id="ex"></div>
+</section>
+<section id="t-g">
+<div class="card"><h2>Conectar con Google Sheets (en vivo, automático)</h2>
+<label>Link de tu Apps Script (termina en /exec)</label>
+<input id="apiurl" type="url" placeholder="https://script.google.com/macros/s/AAA.../exec">
+<div class="g2"><button class="btn" id="apisave">Guardar y conectar</button><button class="btn sec" id="apitest">Probar conexión</button></div>
+<p class="tip" id="apimsg"></p>
+<p class="tip">Pega aquí el mismo link en <b>cada celular</b> que vaya a usar esta página (el tuyo y el del vendedor). Una vez guardado, todo se sincroniza solo.</p></div>
+</section>
+</main>
+<div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const P={cruda:2,frita:2.25,promo:5};
+const SAB=[['Pollo','G','J'],['Carne','H','K'],['Queso','I','L']];
+const PROD=[['verde','VERDE','unidad'],['aceite','ACEITE','litro'],['queso','QUESO','libra'],['pc','POLLO/CARNE','unidad'],['bandeja','BANDEJA','unidad'],['mayo','MAYONESA x paquete','unidad'],['aji','AJÍ x paquete','unidad'],['freir','ACEITE PARA FREÍR','litro']];
+const DOW=['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
+const TIPO={mo:'Mano de obra',log:'Logística',ven:'Vendedor'};
+const S={ventas:[],compras:[],pagos:[],cortesias:[]};
+let store=null,fecha='';
+const pad=n=>String(n).padStart(2,'0');
+const hoy=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+const money=n=>'$'+n.toFixed(2).replace('.',',');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),1600)}
+
+/* ---------- almacenamiento: solo en este dispositivo ---------- */
+function localStore(){
+  const mem={};const subs={};
+  const load=c=>{try{return JSON.parse(localStorage.getItem('sra_'+c)||'[]')}catch(e){return mem[c]||[]}};
+  const save=(c,a)=>{mem[c]=a;try{localStorage.setItem('sra_'+c,JSON.stringify(a))}catch(e){}(subs[c]||[]).forEach(f=>f(a))};
+  return{mode:'local',
+    async add(c,d){const a=load(c);a.push({id:Date.now()+''+Math.random().toString(36).slice(2,6),...d});save(c,a)},
+    async del(c,id){save(c,load(c).filter(x=>x.id!==id))},
+    sub(c,f){(subs[c]=subs[c]||[]).push(f);f(load(c))}};
+}
+function remoteStore(url){
+  const cache={ventas:[],compras:[],pagos:[]}, subs={ventas:[],compras:[],pagos:[]};
+  let pending=[];try{pending=JSON.parse(localStorage.getItem('sra_pending')||'[]')}catch(e){}
+  const savePending=()=>{try{localStorage.setItem('sra_pending',JSON.stringify(pending))}catch(e){}};
+  const notify=c=>(subs[c]||[]).forEach(f=>f(cache[c]));
+  async function flushPending(){
+    if(!pending.length)return;const rest=[];
+    for(const p of pending){try{await fetch(url,{method:'POST',body:JSON.stringify(p)})}catch(e){rest.push(p)}}
+    pending=rest;savePending();
+  }
+  let polling=false;
+  async function poll(){
+    if(polling)return;polling=true;
+    try{
+      await flushPending();
+      const r=await fetch(url+'?_='+Date.now());const j=await r.json();
+      ['ventas','compras','pagos','cortesias'].forEach(c=>{cache[c]=j[c]||[];notify(c)});
+      const st=$('#st');if(st)st.innerHTML='<span class="cfgok">● en línea</span> (Google Sheets)';
+    }catch(e){const st=$('#st');if(st)st.textContent='sin conexión — reintentando…';}
+    polling=false;
+  }
+  poll();setInterval(poll,15000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
+  window.addEventListener('online',poll);
+  return{mode:'remote',
+    async add(c,d){
+      const doc={coleccion:c,...d};const tmp={id:'tmp'+Date.now()+Math.random().toString(36).slice(2,5),...d};
+      cache[c]=[...cache[c],tmp];notify(c);
+      try{await fetch(url,{method:'POST',body:JSON.stringify(doc)})}catch(e){pending.push(doc);savePending()}
+      setTimeout(poll,2500);
+    },
+    async del(c,id){
+      cache[c]=cache[c].filter(x=>x.id!==id);notify(c);
+      if(!String(id).startsWith('tmp')){try{await fetch(url+'?action=del&coleccion='+c+'&id='+encodeURIComponent(id))}catch(e){}}
+      setTimeout(poll,2500);
+    },
+    sub(c,f){(subs[c]=subs[c]||[]).push(f);f(cache[c])}};
+}
+async function connect(){
+  const url=(localStorage.getItem('sra_apiurl')||'').trim();
+  if(url)return remoteStore(url);
+  const st=$('#st');if(st)st.textContent='guardado en este dispositivo — configúralo en ⚙ Config';
+  return localStore();
+}
+function initConfig(){
+  const saved=localStorage.getItem('sra_apiurl')||'';
+  $('#apiurl').value=saved;
+  $('#apisave').onclick=()=>{
+    const v=$('#apiurl').value.trim();
+    if(!v.includes('/exec')){$('#apimsg').textContent='Ese link no parece de Apps Script (debe terminar en /exec).';return}
+    localStorage.setItem('sra_apiurl',v);$('#apimsg').textContent='Guardado. Recargando...';
+    setTimeout(()=>location.reload(),600);
+  };
+  $('#apitest').onclick=async()=>{
+    const v=$('#apiurl').value.trim();if(!v){$('#apimsg').textContent='Escribe el link primero.';return}
+    $('#apimsg').textContent='Probando...';
+    try{const r=await fetch(v+'?_='+Date.now());const j=await r.json();
+      $('#apimsg').innerHTML='<span class="cfgok">¡Conectado! ✓</span> ('+(j.version||'sin version')+') Ventas: '+(j.ventas||[]).length+', Compras: '+(j.compras||[]).length+', Pagos: '+(j.pagos||[]).length;
+    }catch(e){$('#apimsg').textContent='No se pudo conectar. Revisa que el Deploy sea "Cualquiera" y que el link termine en /exec.'}
+  };
+}
+
+/* ---------- ventas (acumula en pantalla, se guarda como UNA venta con "Guardar venta") ---------- */
+let pend={}; // {codigo: cantidad} de la venta que se está armando, aún sin guardar
+const NOMBRE={G:'Pollo cruda',H:'Carne cruda',I:'Queso cruda',J:'Pollo frita',K:'Carne frita',L:'Queso frita',M:'Promo 3x$5'};
+const precioDe=k=>k==='M'?P.promo:(['J','K','L'].includes(k)?P.frita:P.cruda);
+const bandejasDe=k=>k==='M'?3:1;
+function buildGrid(){
+  $('#grid').innerHTML=SAB.map(([n,c,f])=>`<div class="row"><b>${n}</b>
+  <div class="tap" role="button" tabindex="0" data-p="${c}"><span>Cruda</span><span class="n" id="n-${c}">0</span><small>${money(P.cruda)}</small><button class="und" data-u="${c}">−</button></div>
+  <div class="tap" role="button" tabindex="0" data-p="${f}"><span>Frita</span><span class="n" id="n-${f}">0</span><small>${money(P.frita)}</small><button class="und" data-u="${f}">−</button></div></div>`).join('');
+}
+function totalPend(){let $=0,b=0;Object.entries(pend).forEach(([k,n])=>{$+=precioDe(k)*n;b+=bandejasDe(k)*n});return{$,b}}
+const cnt=(prod,f=fecha)=>S.ventas.filter(v=>v.fecha===f&&v.prod===prod).length;
+const ventaDia=f=>{const g=k=>cnt(k,f);return{$:(g('G')+g('H')+g('I'))*P.cruda+(g('J')+g('K')+g('L'))*P.frita+g('M')*P.promo,b:'GHIJKL'.split('').reduce((a,k)=>a+g(k),0)+g('M')*3}};
+function rPend(){
+  'GHIJKLM'.split('').forEach(k=>{const e=$('#n-'+k);if(e)e.textContent=pend[k]||0});
+  const t=totalPend();$('#pendTotal').textContent=money(t.$);$('#pendBandejas').textContent=t.b;
+  $('#guardarVenta').disabled=t.b===0;
+}
+function rVentas(){
+  const dia=S.ventas.filter(v=>v.fecha===fecha);
+  const grupos={};dia.forEach(v=>{const g=v.venta||v.id;(grupos[g]=grupos[g]||[]).push(v)});
+  const keys=Object.keys(grupos).sort((a,b)=>grupos[a][0].t-grupos[b][0].t);
+  $('#vl').innerHTML=keys.length?keys.map(g=>{
+    const items=grupos[g];const cnts={};items.forEach(v=>cnts[v.prod]=(cnts[v.prod]||0)+1);
+    const txt=Object.entries(cnts).map(([k,n])=>NOMBRE[k]+' x'+n).join(' · ');
+    const tot=items.reduce((a,v)=>a+precioDe(v.prod),0);
+    const pagado=!!items[0].pagado;
+    return `<div class="li"><span>${txt}<br><b>${money(tot)}</b></span><div class="rt"><button class="pagobtn${pagado?' si':''}" data-pagar="${g}">${pagado?'✓ Pagado':'Pendiente de pago'}</button><button data-dv="${g}">✕</button></div></div>`;
+  }).join(''):'<p class="tip">Sin ventas guardadas este día.</p>';
+  let $t=0,bt=0;dia.forEach(v=>{$t+=precioDe(v.prod);bt+=bandejasDe(v.prod)});
+  $('#vt').textContent=money($t);$('#vb').textContent=bt;
+  rPend();
+}
+document.addEventListener('click',e=>{
+  const u=e.target.closest('[data-u]'),t=e.target.closest('[data-p]');
+  if(u){e.stopPropagation();const k=u.dataset.u;if(pend[k]>0){pend[k]--;if(!pend[k])delete pend[k]}rPend();return}
+  if(t){const k=t.dataset.p;pend[k]=(pend[k]||0)+1;rPend();if(navigator.vibrate)navigator.vibrate(15)}
+});
+$('#guardarVenta').onclick=async()=>{
+  const entries=Object.entries(pend);if(!entries.length)return;
+  const grupo='v'+Date.now()+Math.random().toString(36).slice(2,5);let i=0;
+  for(const[k,n]of entries){for(let j=0;j<n;j++){await store.add('ventas',{fecha,prod:k,venta:grupo,pagado:false,t:Date.now()+(i++)})}}
+  pend={};rPend();toast('Venta guardada');
+};
+document.addEventListener('click',async e=>{
+  const dv=e.target.closest('[data-dv]');if(!dv)return;
+  const g=dv.dataset.dv;const items=S.ventas.filter(v=>v.fecha===fecha&&(v.venta||v.id)===g);
+  if(!confirm('¿Borrar esta venta completa?'))return;
+  for(const it of items){await store.del('ventas',it.id)}
+  toast('Venta borrada');
+});
+document.addEventListener('click',async e=>{
+  const pg=e.target.closest('[data-pagar]');if(!pg)return;
+  const g=pg.dataset.pagar;const items=S.ventas.filter(v=>v.fecha===fecha&&(v.venta||v.id)===g);
+  if(!items.length)return;
+  const nuevo=!items[0].pagado;
+  for(const it of items){await store.del('ventas',it.id);await store.add('ventas',{fecha:it.fecha,prod:it.prod,venta:g,pagado:nuevo,t:it.t})}
+  toast(nuevo?'Marcada como pagada':'Marcada como pendiente');
+});
+
+/* ---------- cortesias (regalo para probar: sin precio, sin pago) ---------- */
+let pendK={};
+function buildGridK(){
+  $('#gridK').innerHTML=SAB.map(([n,c,f])=>`<div class="row"><b>${n}</b>
+  <div class="tap" role="button" tabindex="0" data-kp="${c}"><span>Cruda</span><span class="n" id="nk-${c}">0</span><button class="und" data-ku="${c}">−</button></div>
+  <div class="tap" role="button" tabindex="0" data-kp="${f}"><span>Frita</span><span class="n" id="nk-${f}">0</span><button class="und" data-ku="${f}">−</button></div></div>`).join('');
+}
+function rPendK(){
+  'GHIJKL'.split('').forEach(k=>{const e=$('#nk-'+k);if(e)e.textContent=pendK[k]||0});
+  const b=Object.values(pendK).reduce((a,n)=>a+n,0);
+  $('#pendKBandejas').textContent=b;
+  $('#guardarCortesia').disabled=b===0;
+}
+function rCortesias(){
+  const dia=S.cortesias.filter(x=>x.fecha===fecha);
+  const grupos={};dia.forEach(x=>{const g=x.grupo||x.id;(grupos[g]=grupos[g]||[]).push(x)});
+  const keys=Object.keys(grupos).sort((a,b)=>grupos[a][0].t-grupos[b][0].t);
+  $('#kl').innerHTML=keys.length?keys.map(g=>{
+    const items=grupos[g];const cnts={};items.forEach(x=>cnts[x.prod]=(cnts[x.prod]||0)+1);
+    const txt=Object.entries(cnts).map(([k,n])=>NOMBRE[k]+' x'+n).join(' · ');
+    const dest=items[0].destinatario;
+    return `<div class="li"><span>${txt}${dest?'<br><small style="color:var(--mut)">Para: '+esc(dest)+'</small>':''}</span><button data-dk="${g}">✕</button></div>`;
+  }).join(''):'<p class="tip">Sin cortesías guardadas este día.</p>';
+  $('#kb').textContent=dia.length;
+  rPendK();
+}
+document.addEventListener('click',e=>{
+  const u=e.target.closest('[data-ku]'),t=e.target.closest('[data-kp]');
+  if(u){e.stopPropagation();const k=u.dataset.ku;if(pendK[k]>0){pendK[k]--;if(!pendK[k])delete pendK[k]}rPendK();return}
+  if(t){const k=t.dataset.kp;pendK[k]=(pendK[k]||0)+1;rPendK();if(navigator.vibrate)navigator.vibrate(15)}
+});
+$('#guardarCortesia').onclick=async()=>{
+  const entries=Object.entries(pendK);if(!entries.length)return;
+  const grupo='k'+Date.now()+Math.random().toString(36).slice(2,5);
+  const dest=$('#destinatario').value.trim();let i=0;
+  for(const[k,n]of entries){for(let j=0;j<n;j++){await store.add('cortesias',{fecha,prod:k,grupo,destinatario:dest,t:Date.now()+(i++)})}}
+  pendK={};$('#destinatario').value='';rPendK();toast('Cortesía guardada');
+};
+document.addEventListener('click',async e=>{
+  const dk=e.target.closest('[data-dk]');if(!dk)return;
+  const g=dk.dataset.dk;const items=S.cortesias.filter(x=>x.fecha===fecha&&(x.grupo||x.id)===g);
+  if(!confirm('¿Borrar esta cortesía completa?'))return;
+  for(const it of items){await store.del('cortesias',it.id)}
+  toast('Cortesía borrada');
+});
+
+/* ---------- compras ---------- */
+function buildCompras(){
+  $('#cf').innerHTML=PROD.map(([k,n,u])=>`<div class="g2"><div><label>${n} (${u})</label><input id="q-${k}" type="number" step="any" inputmode="decimal" placeholder="cantidad"></div><div><label>Precio total ($)</label><input id="p-${k}" type="number" step="0.01" inputmode="decimal" placeholder="0,00"></div></div>`).join('');
+}
+function rCompras(){
+  const l=S.compras.filter(c=>c.fecha===fecha).sort((a,b)=>a.t-b.t);
+  $('#cl').innerHTML=l.length?l.map(c=>`<div class="li"><span>${(PROD.find(p=>p[0]===c.producto)||[,c.producto])[1]} — ${c.cantidad} → <b>${money(+c.precio)}</b></span><button data-dc="${c.id}">✕</button></div>`).join(''):'<p class="tip">Sin compras este día.</p>';
+}
+$('#cs').onclick=async()=>{
+  const items=PROD.map(([k])=>[k,parseFloat($('#q-'+k).value)||0,parseFloat($('#p-'+k).value)||0]).filter(([,q,p])=>q>0||p>0);
+  if(!items.length)return toast('Escribe al menos un producto');
+  let i=0;for(const[k,q,p]of items){await store.add('compras',{fecha,producto:k,cantidad:q,precio:p,t:Date.now()+i});i++}
+  PROD.forEach(([k])=>{$('#q-'+k).value='';$('#p-'+k).value=''});toast('Compra guardada');
+};
+
+/* ---------- pagos ---------- */
+function rPagos(){
+  const l=S.pagos.filter(p=>p.fecha===fecha).sort((a,b)=>a.t-b.t);
+  $('#pl').innerHTML=l.length?l.map(p=>`<div class="li"><span><b>${TIPO[p.tipo]}</b> ${money(+p.monto)}<br>${esc(p.detalle)}</span><button data-dp="${p.id}">✕</button></div>`).join(''):'<p class="tip">Sin pagos este día.</p>';
+}
+$('#ps').onclick=async()=>{
+  const m=parseFloat($('#pmonto').value);if(!(m>0))return toast('Escribe el monto');
+  await store.add('pagos',{fecha,tipo:$('#ptipo').value,monto:m,detalle:$('#pdet').value.trim(),t:Date.now()});
+  $('#pmonto').value='';$('#pdet').value='';toast('Pago guardado');
+};
+document.addEventListener('click',async e=>{
+  const c=e.target.closest('[data-dc]'),p=e.target.closest('[data-dp]');
+  if(c&&confirm('¿Borrar esta compra?'))await store.del('compras',c.dataset.dc);
+  if(p&&confirm('¿Borrar este pago?'))await store.del('pagos',p.dataset.dp);
+});
+
+/* ---------- resumen ---------- */
+function rResumen(){
+  const blk=(tit,f)=>{
+    const dias=[...new Set(S.ventas.filter(v=>f(v.fecha)).map(v=>v.fecha))];
+    let vt=0,vb=0;dias.forEach(d=>{const x=ventaDia(d);vt+=x.$;vb+=x.b});
+    const vsel=S.ventas.filter(v=>f(v.fecha));
+    const vpag=vsel.filter(v=>v.pagado).reduce((a,v)=>a+precioDe(v.prod),0);
+    const vpend=vt-vpag;
+    const ct=S.compras.filter(c=>f(c.fecha)).reduce((a,c)=>a+(+c.precio||0),0);
+    const pg=k=>S.pagos.filter(p=>f(p.fecha)&&p.tipo===k).reduce((a,p)=>a+(+p.monto||0),0);
+    const kb=S.cortesias.filter(x=>f(x.fecha)).length;
+    return`<div class="card"><h2>${tit}</h2><div class="kpis">
+    <div class="k"><span>Ventas</span><b>${money(vt)}</b></div><div class="k"><span>Bandejas vendidas</span><b>${vb}</b></div>
+    <div class="k"><span>Ventas pagadas</span><b>${money(vpag)}</b></div><div class="k"><span>Ventas pendientes de pago</span><b>${money(vpend)}</b></div>
+    <div class="k"><span>Compras (materia prima)</span><b>${money(ct)}</b></div><div class="k"><span>Pagos mano de obra</span><b>${money(pg('mo'))}</b></div>
+    <div class="k"><span>Pagos logística</span><b>${money(pg('log'))}</b></div><div class="k"><span>Pagos vendedor</span><b>${money(pg('ven'))}</b></div>
+    <div class="k"><span>Bandejas regaladas (cortesía)</span><b>${kb}</b></div></div></div>`};
+  $('#res').innerHTML=blk('Total del día '+fecha,d=>d===fecha)+blk('Total del mes '+fecha.slice(0,7),d=>d.slice(0,7)===fecha.slice(0,7))+blk('Todo lo registrado',()=>true)+
+  '<p class="tip">Los costos, la utilidad y los márgenes los calcula tu Excel con su dashboard; aquí solo se registra lo que pasó.</p>';
+}
+
+/* ---------- exportar (mismo orden de columnas que el Excel) ---------- */
+const num=(n,coma)=>{if(!n)return'';let s=String(Math.round(n*10000)/10000);return coma?s.replace('.',','):s};
+const dparts=d=>{const[y,m,dd]=d.split('-').map(Number);return[y,m,dd,DOW[new Date(y,m-1,dd).getDay()]]};
+function rowsExport(mes,coma){
+  const inM=d=>mes==='todo'||d.slice(0,7)===mes;
+  const dV=[...new Set(S.ventas.filter(v=>inM(v.fecha)).map(v=>v.fecha))].sort();
+  const V=dV.map(d=>[...dparts(d),'','',...'GHIJKLM'.split('').map(k=>num(cnt(k,d),coma))]);
+  const dC=[...new Set(S.compras.filter(c=>inM(c.fecha)).map(c=>c.fecha))].sort();
+  const C=dC.map(d=>{const cs=S.compras.filter(c=>c.fecha===d);const r=[...dparts(d)];
+    PROD.forEach(([k])=>{let q=0,p=0;cs.forEach(c=>{if(c.producto===k){q+=+c.cantidad||0;p+=+c.precio||0}});r.push(num(q,coma),num(p,coma))});return r});
+  const pg=k=>S.pagos.filter(p=>p.tipo===k&&inM(p.fecha)).sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.t-b.t).map(p=>{const[y,m,d]=p.fecha.split('-');return[d+'/'+m+'/'+y,num(+p.monto,coma),p.detalle]});
+  const cnt2=(prod,f)=>S.cortesias.filter(x=>x.fecha===f&&x.prod===prod).length;
+  const dK=[...new Set(S.cortesias.filter(x=>inM(x.fecha)).map(x=>x.fecha))].sort();
+  const K=dK.map(d=>{const[y,m,dd]=d.split('-');return[dd+'/'+m+'/'+y,...'GHIJKL'.split('').map(k=>num(cnt2(k,d),coma))]});
+  return{'VENTAS':V,'COMPRAS':C,'PAGOS MO':pg('mo'),'PAGOS LOGISTICA':pg('log'),'PAGOS VENDEDOR':pg('ven'),'CORTESIAS':K};
+}
+const H={'VENTAS':'Pega en la hoja VENTAS, columna A, en la fila de la primera fecha (llena A a M).','COMPRAS':'Pega en la hoja COMPRAS, columna A, en la fila de la fecha (llena A a T).','PAGOS MO':'Pega en PAGOS MO desde la celda A5.','PAGOS LOGISTICA':'Pega en PAGOS LOGISTICA desde la celda A5.','PAGOS VENDEDOR':'Pega en PAGOS VENDEDOR desde la celda A5.','CORTESIAS':'Pega en la hoja CORTESIAS, columna A, en la fila de la fecha (llena A a G). El destinatario no se exporta aquí; revísalo en la app o en Google Sheets.'};
+function rExport(){
+  const meses=[...new Set([...S.ventas,...S.compras,...S.pagos].map(x=>x.fecha.slice(0,7)))].sort();
+  const sel=$('#emes'),cur=sel.value||(meses.includes(fecha.slice(0,7))?fecha.slice(0,7):'todo');
+  sel.innerHTML='<option value="todo">Todo lo registrado</option>'+meses.map(m=>`<option value="${m}">${m}</option>`).join('');sel.value=meses.includes(cur)||cur==='todo'?cur:'todo';
+  const coma=$('#coma').checked,R=rowsExport(sel.value,coma);
+  $('#ex').innerHTML=Object.entries(R).map(([n,rows])=>`<div class="card"><h2>${n} (${rows.length} filas)</h2><p class="tip">${H[n]}</p>
+  <textarea readonly id="ta-${n.replace(/ /g,'_')}">${esc(rows.map(r=>r.join('\t')).join('\n'))}</textarea>
+  <div class="g2"><button class="btn sec" data-copy="${n.replace(/ /g,'_')}">Copiar</button><button class="btn sec" data-dl="${n}">Descargar CSV</button></div></div>`).join('');
+}
+$('#emes').onchange=rExport;$('#coma').onchange=rExport;
+document.addEventListener('click',async e=>{
+  const c=e.target.closest('[data-copy]'),d=e.target.closest('[data-dl]');
+  if(c){const ta=$('#ta-'+c.dataset.copy);ta.select();let ok=false;try{await navigator.clipboard.writeText(ta.value);ok=true}catch(x){try{ok=document.execCommand('copy')}catch(y){}}toast(ok?'Copiado, pega en Excel':'Texto seleccionado: presiona Copiar de tu teclado')}
+  if(d){const n=d.dataset.dl,coma=$('#coma').checked,rows=rowsExport($('#emes').value,coma)[n],sep=coma?';':',';
+    const csv='\ufeff'+rows.map(r=>r.map(x=>/[;,"\n]/.test(x)?'"'+String(x).replace(/"/g,'""')+'"':x).join(sep)).join('\n');
+    try{const dl=await claude.use('downloads');if(!dl)throw 0;await dl.save({filename:n.replace(/ /g,'_')+'_'+$('#emes').value+'.csv',data:csv})}catch(x){toast('Descarga no disponible: usa Copiar')}}
+});
+
+/* ---------- arranque ---------- */
+function all(){rVentas();rCortesias();rCompras();rPagos();rResumen();rExport()}
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;$$('nav button').forEach(x=>x.classList.toggle('on',x===b));$$('section').forEach(s=>s.classList.toggle('on',s.id==='t-'+b.dataset.t))};
+fecha=hoy();$('#fecha').value=fecha;$('#fecha').onchange=e=>{fecha=e.target.value||hoy();all()};
+buildGrid();buildGridK();buildCompras();initConfig();all();
+connect().then(s=>{store=s;
+  ['ventas','compras','pagos','cortesias'].forEach(c=>s.sub(c,a=>{S[c]=a;all()}));
+});
+</script></body></html>
