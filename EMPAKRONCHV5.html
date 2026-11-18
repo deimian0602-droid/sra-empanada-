@@ -470,7 +470,7 @@ function rCaja(){
   const mv=[...S.caja.map(m=>({...m,_clase:'caja'})),...S.retiros.map(m=>({...m,t:m.t||0,_clase:'retiro'}))].sort((a,b)=>b.t-a.t);
   $('#cj-mov').innerHTML=mv.length?mv.map(m=>{
     const txt=m._clase==='retiro'?`Retiro de utilidad desde ${m.desde==='efectivo'?'💵 efectivo':'🏦 cuenta'}`:(m.tipo==='traspaso'?`${m.de==='efectivo'?'💵 Efectivo → 🏦 Cuenta':'🏦 Cuenta → 💵 Efectivo'}`:(m.tipo==='abono'?`Pago a ${esc(m.acreedor)} desde ${m.desde==='efectivo'?'💵 efectivo':'🏦 cuenta'}`:`Ajuste ${m.cuenta==='efectivo'?'💵 efectivo':'🏦 cuenta'}`));
-    return`<div class="li"><span><b>${txt}</b> ${moneyS(+m.monto)}<br><span class="tip" style="margin:0">${m.fecha}${m.detalle?' · '+esc(m.detalle):''}</span></span><button data-dm="${m.id}">✕</button></div>`}).join(''):'<p class="tip">Aún no hay traspasos ni ajustes.</p>';
+    return`<div class="li"><span><b>${txt}</b> ${moneyS(+m.monto)}<br><span class="tip" style="margin:0">${m.fecha}${m.detalle?' · '+esc(m.detalle):''}</span></span>${m._clase==='caja'?`<button data-dm="${m.id}">✕</button>`:''}</div>`}).join(''):'<p class="tip">Aún no hay traspasos ni ajustes.</p>';
   const dd=Object.entries(deudas()).filter(([,d])=>Math.abs(d.saldo)>0.004).sort((a,b)=>b[1].saldo-a[1].saldo);
   $('#cj-deu').innerHTML=`<div class="card"><h2>Cuentas por pagar</h2>${dd.length?dd.map(([,d])=>`<div class="li" style="margin-top:6px"><span><b>${esc(d.nombre)}</b><br><span class="tip" style="margin:0">Comprado ${money(d.compras)} · pagado ${money(d.pagado)}</span></span><b style="color:var(--or)">${moneyS(d.saldo)}</b></div>`).join(''):'<p class="tip">No se debe nada. ✅</p>'}</div>`;
   const sel=$('#dacre'),cur=sel.value;
